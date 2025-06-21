@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:hive/hive.dart';
+
 import '../viewmodels/vocab_viewmodel.dart';
 import '../widgets/vocab_card.dart';
 import 'add_word_screen.dart';
+import 'edit_vocab_screen.dart';
+import '../models/vocab_note.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -39,7 +43,30 @@ class HomeScreen extends StatelessWidget {
           return ListView.builder(
             itemCount: viewModel.vocabList.length,
             itemBuilder: (context, index) {
-              return VocabCard(vocab: viewModel.vocabList[index]);
+              final vocab = viewModel.vocabList[index];
+              return VocabCard(
+                vocab: vocab,
+                onDelete: () async {
+                  final box = await Hive.openBox<VocabNote>('vocabBox');
+                  await box.delete(vocab.key);
+                  viewModel.loadVocabList();
+                },
+                onEdit: () async {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => EditVocabScreen(
+                        vocab: vocab,
+                        onSave: (updated) async {
+                          final box = await Hive.openBox<VocabNote>('vocabBox');
+                          await box.put(vocab.key, updated);
+                          viewModel.loadVocabList();
+                        },
+                      ),
+                    ),
+                  );
+                },
+              );
             },
           );
         },
