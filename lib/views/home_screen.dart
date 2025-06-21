@@ -8,19 +8,33 @@ import 'add_word_screen.dart';
 import 'edit_vocab_screen.dart';
 import '../models/vocab_note.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreenViewModel extends ChangeNotifier {
+  String _searchQuery = '';
+  String get searchQuery => _searchQuery;
+  void setSearchQuery(String value) {
+    _searchQuery = value.trim().toLowerCase();
+    notifyListeners();
+  }
+}
+
+class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => HomeScreenViewModel(),
+      child: const _HomeScreenBody(),
+    );
+  }
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  String _searchQuery = '';
-  final TextEditingController _searchController = TextEditingController();
+class _HomeScreenBody extends StatelessWidget {
+  const _HomeScreenBody({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final searchController = TextEditingController();
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -48,50 +62,53 @@ class _HomeScreenState extends State<HomeScreen> {
           preferredSize: const Size.fromHeight(56),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: SizedBox(
-              height: 40,
-              child: TextField(
-                controller: _searchController,
-                onChanged: (value) {
-                  setState(() {
-                    _searchQuery = value.trim().toLowerCase();
-                  });
-                },
-                style: const TextStyle(fontSize: 16, color: Colors.white),
-                decoration: InputDecoration(
-                  hintText: 'Search word...',
-                  hintStyle: const TextStyle(color: Colors.white70),
-                  prefixIcon: const Icon(Icons.search, color: Colors.white),
-                  filled: true,
-                  fillColor: Colors.blue[700],
-                  contentPadding:
-                      const EdgeInsets.symmetric(vertical: 0, horizontal: 8),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    borderSide: BorderSide.none,
+            child: Consumer<HomeScreenViewModel>(
+              builder: (context, homeViewModel, _) {
+                return SizedBox(
+                  height: 40,
+                  child: TextField(
+                    controller: searchController,
+                    onChanged: homeViewModel.setSearchQuery,
+                    style: const TextStyle(fontSize: 16, color: Colors.white),
+                    decoration: InputDecoration(
+                      hintText: 'Search word...',
+                      hintStyle: const TextStyle(color: Colors.white70),
+                      prefixIcon: const Icon(Icons.search, color: Colors.white),
+                      filled: true,
+                      fillColor: Colors.blue[700],
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 0, horizontal: 8),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
                   ),
-                ),
-              ),
+                );
+              },
             ),
           ),
         ),
       ),
-      body: Consumer<VocabViewModel>(
-        builder: (context, viewModel, child) {
-          if (viewModel.isLoading) {
+      body: Consumer2<VocabViewModel, HomeScreenViewModel>(
+        builder: (context, vocabViewModel, homeViewModel, child) {
+          if (vocabViewModel.isLoading) {
             return const Center(child: CircularProgressIndicator());
           }
-          if (viewModel.error != null) {
-            return Center(child: Text(viewModel.error!));
+          if (vocabViewModel.error != null) {
+            return Center(child: Text(vocabViewModel.error!));
           }
-          final filteredList = _searchQuery.isEmpty
-              ? viewModel.vocabList
-              : viewModel.vocabList
+          final filteredList = homeViewModel.searchQuery.isEmpty
+              ? vocabViewModel.vocabList
+              : vocabViewModel.vocabList
                   .where((vocab) =>
-                      vocab.englishWord.contains(_searchQuery) ||
-                      vocab.banglaTranslation.contains(_searchQuery) ||
-                      vocab.synonyms.any((s) => s.contains(_searchQuery)) ||
-                      vocab.antonyms.any((a) => a.contains(_searchQuery)))
+                      vocab.englishWord.contains(homeViewModel.searchQuery) ||
+                      vocab.banglaTranslation
+                          .contains(homeViewModel.searchQuery) ||
+                      vocab.synonyms
+                          .any((s) => s.contains(homeViewModel.searchQuery)) ||
+                      vocab.antonyms
+                          .any((a) => a.contains(homeViewModel.searchQuery)))
                   .toList();
           if (filteredList.isEmpty) {
             return const Center(child: Text('No words found.'));
@@ -105,7 +122,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 onDelete: () async {
                   final box = await Hive.openBox<VocabNote>('vocabBox');
                   await box.delete(vocab.key);
-                  viewModel.loadVocabList();
+                  vocabViewModel.loadVocabList();
                 },
                 onEdit: () async {
                   Navigator.push(
@@ -116,7 +133,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         onSave: (updated) async {
                           final box = await Hive.openBox<VocabNote>('vocabBox');
                           await box.put(vocab.key, updated);
-                          viewModel.loadVocabList();
+                          vocabViewModel.loadVocabList();
                         },
                       ),
                     ),
