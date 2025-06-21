@@ -12,6 +12,18 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Vocab Note'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add),
+            tooltip: 'Add Word',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const AddWordScreen()),
+              );
+            },
+          ),
+        ],
       ),
       body: Consumer<VocabViewModel>(
         builder: (context, viewModel, child) {
@@ -31,15 +43,6 @@ class HomeScreen extends StatelessWidget {
             },
           );
         },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const AddWordScreen()),
-          );
-        },
-        child: const Icon(Icons.add),
       ),
     );
   }
