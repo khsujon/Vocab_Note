@@ -21,6 +21,7 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => VocabViewModel()..loadVocabList(),
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'Vocab_Note',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
