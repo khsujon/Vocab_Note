@@ -25,12 +25,12 @@ class VocabCard extends StatelessWidget {
       child: Consumer<VocabCardViewModel>(
         builder: (context, cardViewModel, _) {
           return Card(
-            margin: const EdgeInsets.symmetric(
-                vertical: 4, horizontal: 12), // Reduced margin
+            color: Theme.of(context).cardColor,
+            margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
             child: InkWell(
               onTap: cardViewModel.toggleExpanded,
               child: Padding(
-                padding: const EdgeInsets.all(10.0), // Reduced padding
+                padding: const EdgeInsets.all(10.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -45,40 +45,46 @@ class VocabCard extends StatelessWidget {
                                 vocab.englishWord,
                                 style: Theme.of(context)
                                     .textTheme
-                                    .titleMedium, // Smaller text
+                                    .titleMedium
+                                    ?.copyWith(color: Colors.white),
                               ),
-                              const SizedBox(height: 4), // Reduced spacing
+                              const SizedBox(height: 4),
                               Text(
                                 'Bangla: ${vocab.banglaTranslation}',
                                 style: const TextStyle(
                                   fontWeight: FontWeight.w600,
                                   fontSize: 12,
+                                  color: Colors.white,
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        // Move edit and delete buttons here
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             IconButton(
                               icon: const Icon(Icons.edit,
-                                  color: Colors.blue, size: 18), // Smaller icon
+                                  color: Colors.tealAccent, size: 18),
                               tooltip: 'Edit',
                               onPressed: onEdit,
                             ),
                             IconButton(
                               icon: const Icon(Icons.delete,
-                                  color: Colors.red, size: 18), // Smaller icon
+                                  color: Colors.redAccent, size: 18),
                               tooltip: 'Delete',
                               onPressed: () async {
                                 final confirm = await showDialog<bool>(
                                   context: context,
                                   builder: (context) => AlertDialog(
-                                    title: const Text('Delete Word'),
+                                    backgroundColor:
+                                        Theme.of(context).cardColor,
+                                    title: const Text('Delete Word',
+                                        style: TextStyle(color: Colors.white)),
                                     content: const Text(
-                                        'Are you sure you want to delete this word?'),
+                                        'Are you sure you want to delete this word?',
+                                        style:
+                                            TextStyle(color: Colors.white70)),
                                     actions: [
                                       TextButton(
                                         onPressed: () =>
@@ -89,8 +95,8 @@ class VocabCard extends StatelessWidget {
                                         onPressed: () =>
                                             Navigator.of(context).pop(true),
                                         child: const Text('Delete',
-                                            style:
-                                                TextStyle(color: Colors.red)),
+                                            style: TextStyle(
+                                                color: Colors.redAccent)),
                                       ),
                                     ],
                                   ),
@@ -111,16 +117,17 @@ class VocabCard extends StatelessWidget {
                           ? Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const SizedBox(height: 4), // Reduced spacing
+                                const SizedBox(height: 4),
                                 RichText(
                                   text: TextSpan(
                                     style: const TextStyle(
-                                        fontSize: 12, color: Colors.black),
+                                        fontSize: 12, color: Colors.white),
                                     children: [
                                       const TextSpan(
                                         text: 'Part of Speech: ',
                                         style: TextStyle(
-                                            fontWeight: FontWeight.bold),
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.tealAccent),
                                       ),
                                       TextSpan(text: vocab.partOfSpeech),
                                     ],
@@ -129,13 +136,13 @@ class VocabCard extends StatelessWidget {
                                 RichText(
                                   text: TextSpan(
                                     style: const TextStyle(
-                                        fontSize: 12, color: Colors.black),
+                                        fontSize: 12, color: Colors.white),
                                     children: [
                                       const TextSpan(
                                         text: 'Synonyms: ',
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          color: Colors.green,
+                                          color: Colors.greenAccent,
                                         ),
                                       ),
                                       TextSpan(text: vocab.synonyms.join(", ")),
@@ -145,13 +152,13 @@ class VocabCard extends StatelessWidget {
                                 RichText(
                                   text: TextSpan(
                                     style: const TextStyle(
-                                        fontSize: 12, color: Colors.black),
+                                        fontSize: 12, color: Colors.white),
                                     children: [
                                       const TextSpan(
                                         text: 'Antonyms: ',
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          color: Colors.red,
+                                          color: Colors.redAccent,
                                         ),
                                       ),
                                       TextSpan(text: vocab.antonyms.join(", ")),

@@ -19,18 +19,25 @@ class VocabViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> addWord(String word) async {
+  Future<bool> addWord(String word) async {
     word = word.toLowerCase();
     _isLoading = true;
     _error = null;
     notifyListeners();
     try {
+      final box = await Hive.openBox<VocabNote>('vocabBox');
+      final exists = box.values.any((v) => v.englishWord == word);
+      if (exists) {
+        _isLoading = false;
+        notifyListeners();
+        return false; // Word already exists
+      }
       final data = await _dictionaryService.fetchWordData(word);
       if (data == null) {
         _error = 'Word not found';
         _isLoading = false;
         notifyListeners();
-        return;
+        return true;
       }
       final meanings = data['meanings'] as List?;
       final partOfSpeech = meanings != null && meanings.isNotEmpty
@@ -51,7 +58,6 @@ class VocabViewModel extends ChangeNotifier {
         synonyms: synonyms.isNotEmpty ? List<String>.from(synonyms) : ['N/A'],
         antonyms: antonyms.isNotEmpty ? List<String>.from(antonyms) : ['N/A'],
       );
-      final box = await Hive.openBox<VocabNote>('vocabBox');
       await box.add(vocab);
       _vocabList = box.values.toList();
     } catch (e) {
@@ -59,5 +65,6 @@ class VocabViewModel extends ChangeNotifier {
     }
     _isLoading = false;
     notifyListeners();
+    return true;
   }
 }

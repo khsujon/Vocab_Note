@@ -126,7 +126,17 @@ class _AddWordScreenBodyState extends State<_AddWordScreenBody> {
                                 if (_controller.text.isNotEmpty) {
                                   final word =
                                       _controller.text.trim().toLowerCase();
-                                  await viewModel.addWord(word);
+                                  final added = await viewModel.addWord(word);
+                                  if (!added) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                            'Word already exists in your note!'),
+                                        backgroundColor: Colors.orange,
+                                      ),
+                                    );
+                                    return;
+                                  }
                                   if (viewModel.error == null) {
                                     Navigator.pop(context);
                                   }

@@ -40,7 +40,7 @@ class _HomeScreenBody extends StatelessWidget {
         title: const Text(
           'Vocab Note',
           style: TextStyle(
-            color: Colors.black,
+            color: Colors.white,
             fontWeight: FontWeight.bold,
             fontSize: 20,
             letterSpacing: 1.2,
