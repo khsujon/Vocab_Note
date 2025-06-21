@@ -19,4 +19,40 @@ class DictionaryService {
     final result = await FlutterBanglaDictionary.searchWord(word);
     return result;
   }
+
+  // Extract all unique synonyms from all meanings and definitions
+  List<String> extractSynonyms(List<dynamic> meanings) {
+    final Set<String> allSynonyms = {};
+    for (var meaning in meanings) {
+      if (meaning['synonyms'] != null) {
+        allSynonyms.addAll(List<String>.from(meaning['synonyms']));
+      }
+      if (meaning['definitions'] != null) {
+        for (var def in meaning['definitions']) {
+          if (def['synonyms'] != null) {
+            allSynonyms.addAll(List<String>.from(def['synonyms']));
+          }
+        }
+      }
+    }
+    return allSynonyms.toList();
+  }
+
+  // Extract all unique antonyms from all meanings and definitions
+  List<String> extractAntonyms(List<dynamic> meanings) {
+    final Set<String> allAntonyms = {};
+    for (var meaning in meanings) {
+      if (meaning['antonyms'] != null) {
+        allAntonyms.addAll(List<String>.from(meaning['antonyms']));
+      }
+      if (meaning['definitions'] != null) {
+        for (var def in meaning['definitions']) {
+          if (def['antonyms'] != null) {
+            allAntonyms.addAll(List<String>.from(def['antonyms']));
+          }
+        }
+      }
+    }
+    return allAntonyms.toList();
+  }
 }

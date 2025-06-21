@@ -37,10 +37,10 @@ class VocabViewModel extends ChangeNotifier {
           ? meanings[0]['partOfSpeech'] ?? 'N/A'
           : 'N/A';
       final synonyms = meanings != null && meanings.isNotEmpty
-          ? List<String>.from(meanings[0]['synonyms'] ?? [])
+          ? _dictionaryService.extractSynonyms(meanings)
           : [];
       final antonyms = meanings != null && meanings.isNotEmpty
-          ? List<String>.from(meanings[0]['antonyms'] ?? [])
+          ? _dictionaryService.extractAntonyms(meanings)
           : [];
       final bangla =
           await _dictionaryService.fetchBanglaTranslation(word) ?? 'N/A';
